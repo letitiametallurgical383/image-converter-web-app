@@ -1,0 +1,173 @@
+# Image Converter Web App
+
+> **Live URL**: [https://image-converter-web-app-project.leonardwalujan.eu.org](https://image-converter-web-app-project.leonardwalujan.eu.org)
+> **Repository**: [https://github.com/walujanle/image-converter-web-app](https://github.com/walujanle/image-converter-web-app)
+
+> **Desktop App**: [https://github.com/walujanle/image-converter-desktop-app](https://github.com/walujanle/image-converter-desktop-app)
+> Prefer a native desktop experience? A cross-platform desktop version with system-level file integration is also available.
+
+---
+
+## Overview
+
+**Image Converter Web App** is a browser-based tool that lets you convert, compress, crop, and rename images directly on your device. Your photos are processed inside your browser using your own device's power. Your files are never uploaded to any server.
+
+Think of it as a tiny photo studio that lives entirely inside your browser tab. You pick your images, choose what you want to do with them, and the results are saved straight to your device.
+
+---
+
+## Project Goals
+
+This project was built out of curiosity and experimentation. The main question was:
+
+> _Can a full image converter run entirely inside a web browser without sending files to a server?_
+
+The answer turned out to be **yes**. Every conversion, every crop, and every quality adjustment happens locally on your device. Your photos never travel across the internet. This means:
+
+- **Privacy by design** — your personal photos stay on your device
+- **No waiting for uploads** — processing starts immediately
+- **Works offline** — once loaded, it does not need an internet connection to convert images
+- **Speed depends on your device** — faster computers finish conversions faster
+
+The project was created while exploring what kind of web applications can be built using only browser capabilities. It is a proof that complex image processing can be done client-side using modern web technologies.
+
+---
+
+## Tech Stack Used
+
+| Technology                       | Purpose                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| **React 19**                     | User interface and interactive components                                 |
+| **TypeScript 5.8**               | Type-safe code that prevents bugs before they happen                      |
+| **Vite 8**                       | Fast development server and optimized production builds                   |
+| **Bun**                          | JavaScript runtime and package manager                                    |
+| **Tailwind CSS 4**               | Utility-first styling for a clean and responsive design                   |
+| **Zustand**                      | Lightweight state management for app settings and conversion queues       |
+| **Web Workers**                  | Background threads that handle heavy image work without freezing the page |
+| **WASM Encoders** (`@jsquash/*`) | High-performance image encoding written in WebAssembly for speed          |
+| **heic-to**                      | Converts HEIC/HEIF photos from iPhones into editable formats              |
+| **exifreader / piexifjs**        | Reads and writes image metadata (EXIF, XMP, IPTC, ICC profiles)           |
+| **JSZip**                        | Packages multiple converted images into a single ZIP file for download    |
+| **Biome**                        | Code formatting and linting to keep the codebase clean                    |
+| **Vitest**                       | Automated testing to catch regressions before they reach users            |
+
+---
+
+## Features
+
+### 1. Batch Image Conversion
+
+Select multiple images at once and convert them all in one go. The tool reads each file, validates it, converts it to your chosen format, and prepares it for download. A pool of background workers processes images in parallel so the page stays responsive.
+
+### 2. Multiple Output Formats
+
+Choose the format that fits your needs:
+
+| Format   | Quality Control      | Lossless Mode | Metadata Preservation |
+| -------- | -------------------- | ------------- | --------------------- |
+| **JPG**  | Yes                  | No            | Yes                   |
+| **PNG**  | No (always lossless) | Yes           | Yes                   |
+| **WebP** | Yes                  | Yes           | Yes                   |
+| **AVIF** | Yes                  | Yes           | No                    |
+
+### 3. Quality Control
+
+For lossy formats (JPG, WebP, AVIF), pick a quality preset — Low, Medium, High, or Ultra — to balance file size and visual quality.
+
+### 4. Lossless Mode
+
+WebP and AVIF support lossless compression, which keeps every pixel exactly the same as the original but still reduces file size. PNG is always lossless.
+
+### 5. Percentage Crop
+
+Crop images by defining margins from each edge (top, right, bottom, left) as percentages. This is useful for removing unwanted borders or framing a subject precisely.
+
+### 6. Filename Transforms
+
+Rename your output files automatically:
+
+- Add a prefix to all files
+- Find and replace text in filenames
+- Case-sensitive or insensitive matching
+- Automatic collision handling if two files would end up with the same name
+
+### 7. Presets
+
+Save your favorite settings as named presets and apply them later. Presets are stored in your browser's local storage so they persist between visits.
+
+### 8. ZIP Download
+
+When converting multiple images, download all results as a single ZIP file instead of clicking each one individually.
+
+### 9. Metadata Preservation (Opt-In)
+
+When enabled, the tool copies EXIF, XMP, IPTC, and ICC metadata from the original image into the converted output. This is disabled by default because metadata can contain private information like GPS location, camera model, and editing history.
+
+- **Supported**: JPG, PNG, and WebP outputs
+- **Not supported**: AVIF output
+
+### 10. Memory Safety Checks
+
+Before starting a conversion, the tool estimates how much memory the operation will need. If a file is too large or too high-resolution for safe processing, it is rejected with a clear message.
+
+### 11. Dark Mode
+
+The interface adapts to your system preference and includes a manual toggle. Your choice is remembered between visits.
+
+---
+
+## Supported File Types
+
+### Input Formats
+
+JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, HEIF
+
+### Output Formats
+
+JPG, PNG, WebP, AVIF
+
+> **Note**: HEIC/HEIF files (common on iPhones) are decoded before conversion. GIF input is supported, but animated GIFs are not preserved as animated outputs.
+
+---
+
+## Architecture Overview
+
+The project is built with a layered architecture that keeps concerns separated. Each layer has a single job:
+
+- **Core** — shared contracts, constants, and typed errors
+- **Domain** — pure business rules such as validation, crop logic, naming, and format helpers
+- **Data** — browser adapters for workers, storage, ZIP creation, and downloads
+- **Presentation** — React UI, hooks, state store, and theme
+- **Workers** — background image conversion and metadata logic
+- **Utils** — shared utility helpers
+- **Tests** — automated tests using Vitest
+
+This separation means the business logic does not know about React or the browser, and the user interface does not know how image encoding works. It makes the project easier to understand, test safely, and extend without breaking existing features.
+
+---
+
+## Limitations
+
+### File Size and Dimensions
+
+- **Maximum file size**: 256 MB per image
+- **Maximum image dimension**: 16,384 pixels on any side
+- Files approaching these limits may be rejected to protect your browser from running out of memory
+
+### Format-Specific Limits
+
+- **AVIF metadata**: Metadata preservation is not supported for AVIF output. EXIF, XMP, IPTC, and ICC data are stripped when converting to AVIF.
+- **GIF animation**: Animated GIFs can be converted, but the output will be a static image, not an animated file.
+- **HEIC/HEIF**: These formats are decoded before conversion. The output will be in your chosen format, not HEIC.
+
+### Processing Behavior
+
+- **No streaming conversion**: All conversions use the full worker pipeline. There is no separate chunked or streaming path.
+- **Memory-dependent performance**: Large files or high-resolution images use more RAM. If your device is low on memory, conversions may be slower or rejected.
+- **Browser-dependent**: Some features rely on modern browser APIs (`OffscreenCanvas`, `Web Workers`, `WebAssembly`). Very old browsers may not be supported.
+
+### Privacy and Security
+
+- The app does not upload your images. Your files are processed entirely on your device.
+- Metadata preservation is **opt-in** and disabled by default because metadata can contain sensitive information.
+- The app validates file contents using binary signatures, not just file extensions, to prevent malformed files from causing errors.
