@@ -8,12 +8,35 @@ const SHELL_ASSETS = [
   "/icon-512.png",
 ];
 
+function cleanResponse(response) {
+  if (!response.redirected) return Promise.resolve(response);
+  const cloned = response.clone();
+  const bodyPromise = "body" in cloned
+    ? Promise.resolve(cloned.body)
+    : cloned.blob();
+  return bodyPromise.then((body) =>
+    new Response(body, {
+      headers: cloned.headers,
+      status: cloned.status,
+      statusText: cloned.statusText,
+    })
+  );
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_VERSION)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
-      .then(() => self.skipWaiting()),
+      .then((cache) =>
+        Promise.all(
+          SHELL_ASSETS.map((url) =>
+            fetch(url, { redirect: "follow" }).then((response) =>
+              cleanResponse(response).then((clean) => cache.put(url, clean))
+            )
+          )
+        )
+      )
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -58,19 +81,21 @@ self.addEventListener("fetch", (event) => {
 
   if (isNavigationRequest) {
     event.respondWith(
-      caches.match("/index.html").then(
-        (cached) =>
-          cached ??
-          fetch(request).then((response) => {
+      caches
+        .match("/index.html")
+        .then((cached) => {
+          if (cached) return cleanResponse(cached);
+          return fetch(request, { redirect: "follow" }).then((response) => {
             if (response.ok) {
-              const clone = response.clone();
-              caches
-                .open(CACHE_VERSION)
-                .then((cache) => cache.put(request, clone));
+              cleanResponse(response).then((clean) =>
+                caches
+                  .open(CACHE_VERSION)
+                  .then((cache) => cache.put("/index.html", clean))
+              );
             }
             return response;
-          }),
-      ),
+          });
+        })
     );
     return;
   }
@@ -78,13 +103,14 @@ self.addEventListener("fetch", (event) => {
   if (isStaticAsset) {
     event.respondWith(
       caches.match(request).then((cached) => {
-        if (cached) return cached;
-        return fetch(request).then((response) => {
+        if (cached) return cleanResponse(cached);
+        return fetch(request, { redirect: "follow" }).then((response) => {
           if (response.ok) {
-            const clone = response.clone();
-            caches
-              .open(CACHE_VERSION)
-              .then((cache) => cache.put(request, clone));
+            cleanResponse(response).then((clean) =>
+              caches
+                .open(CACHE_VERSION)
+                .then((cache) => cache.put(request, clean))
+            );
           }
           return response;
         });
@@ -94,8 +120,10 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    fetch(request).catch(() =>
-      caches.match(request).then((c) => c ?? Response.error()),
+    fetch(request, { redirect: "follow" }).catch(() =>
+      caches
+        .match(request)
+        .then((c) => (c ? cleanResponse(c) : Response.error()))
     ),
   );
 });
